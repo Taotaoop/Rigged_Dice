@@ -1,0 +1,64 @@
+def parser():
+    while 1:
+        data = list(input().split(' '))
+        for number in data:
+            if len(number) > 0:
+                yield(number)   
+
+input_parser = parser()
+
+def get_word():
+    global input_parser
+    return next(input_parser)
+
+def get_number():
+    data = get_word()
+    try:
+        return int(data)
+    except ValueError:
+        return float(data)
+
+def guess_rigged_die(rolls, n):
+    alice_score = 0
+    bob_score = 0
+    dice_sixes = np.zeros(2)
+    die_1 = 0 # used to track dice swaps
+    die_2 = 1
+    
+    for i in range(n):
+        # track the scores for swapping purposes
+        alice_score += rolls[i, 0]
+        bob_score += rolls[i, 1]
+        
+        # tally the sixes that each die hits
+        if rolls[i, die_1] == 6:
+            dice_sixes[0] += 1
+        if rolls[i, die_2] == 6:
+            dice_sixes[1] += 1
+        
+        # swap the dice if scores unequal
+        if alice_score != bob_score:
+            if die_1 == 0:
+                die_1 = 1
+                die_2 = 0
+            else:
+                die_1 = 0
+                die_2 = 1
+                
+    # guess the die that rolled more sixes
+    return 1 if dice_sixes[0] > dice_sixes[1] else 2
+    
+import numpy as np
+
+if __name__ == '__main__':
+    num_tests = get_number()
+    for test in range(num_tests):
+        num_rolls = get_number()
+        rolls = np.empty((num_rolls, 2))
+
+        for i in range(num_rolls):
+            rolls[i, 0] = get_number()
+            rolls[i, 1] = get_number()
+
+        print(guess_rigged_die(rolls, num_rolls))
+            
